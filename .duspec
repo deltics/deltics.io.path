@@ -1,0 +1,25 @@
+{
+  "id":"deltics.io.path",
+  "version":"",
+  "summary":"Provides a class for working with path strings",
+  "tags":[
+    "deltics",
+    "path"
+  ],
+  "copyright":"\u00a92020 Jolyon Direnko-Smith",
+  "language":"en",
+  "content":"source",
+  "dependencies":[
+    "deltics.inc:1.3.0",
+    "deltics.constarrays:1.0.1",
+    "deltics.exceptions:1.1.0",
+    "deltics.strings:2.0.0",
+    "deltics.uri:2.0.0"
+  ],
+  "source":{
+      "files":[
+        "src\\deltics.io.path.inc",
+        "src\\Deltics.IO.Path.pas"
+      ]
+    }
+}
