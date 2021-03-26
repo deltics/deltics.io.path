@@ -17,7 +17,9 @@ interface
       procedure AbsoluteToRelativeRaisesEPathExceptionIfPathIsNotAbsolute;
       procedure Append;
       procedure Branch;
+      procedure BranchReturnsEmptyStringWhenThereIsNoParent;
       procedure IsAbsolute;
+      procedure IsNavigation;
       procedure IsRelative;
       procedure Leaf;
       procedure MakePath;
@@ -120,14 +122,41 @@ implementation
     s := Path.Branch('\');
     Test('Branch(\)').Assert(s).IsEmpty;
 
+    s := Path.Branch('c:\windows');
+    Test('Branch(c:\windows)').Assert(s).Equals('c:\');
+
+    s := Path.Branch('c:\windows\');
+    Test('Branch(c:\windows\)').Assert(s).Equals('c:\');
+
+    s := Path.Branch('c:\');
+    Test('Branch(c:\)').Assert(s).IsEmpty;
+
+    s := Path.Branch('c:');
+    Test('Branch(c:)').Assert(s).IsEmpty;
+
     s := Path.Branch('\\');
-    Test('Branch(\\)').Assert(s).Equals('\');
+    Test('Branch(\\)').Assert(s).IsEmpty;
+
+    s := Path.Branch('\\host');
+    Test('Branch(\\host)').Assert(s).IsEmpty;
+
+    s := Path.Branch('\\host\share');
+    Test('Branch(\\host\share)').Assert(s).Equals('\\host');
 
     s := Path.Branch('foo\bar');
     Test('Branch(foo\bar)').Assert(s).Equals('foo');
 
     s := Path.Branch('foo\bar\none');
     Test('Branch(foo\bar\none)').Assert(s).Equals('foo\bar');
+  end;
+
+
+  procedure PathTests.BranchReturnsEmptyStringWhenThereIsNoParent;
+  var
+    s: String;
+  begin
+    s := Path.Branch('c:\');
+    Test('Branch(c:\)').Assert(s).IsEmpty;
   end;
 
 

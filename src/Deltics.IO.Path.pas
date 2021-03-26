@@ -21,10 +21,12 @@ interface
       class function Absolute(const aPath: String; const aRootPath: String = ''): String;
       class function AbsoluteToRelative(const aPath: String; const aBasePath: String = ''): String;
       class function Append(const aBase, aExtension: String): String;
-      class function Branch(const aPath: String): String;
+      class function Branch(const aPath: String): String; overload;
+      class function Branch(const aPath: String; var aParent: String): Boolean; overload;
       class function CurrentDir: String;
       class function Exists(const aPath: String): Boolean;
       class function IsAbsolute(const aPath: String): Boolean;
+      class function IsNavigation(const aPath: String): Boolean;
       class function IsRelative(const aPath: String): Boolean;
       class function Leaf(const aPath: String): String;
       class function MakePath(const aElements: array of const): String;
@@ -93,7 +95,7 @@ implementation
 
       if STR.BeginsWithText(aPath, stem) then
       begin
-        result := nav + '\' + Copy(aPath, Length(stem) + 2, Length(aPath) - Length(stem) + 1);
+        result := Append(nav, Copy(aPath, Length(stem) + 1, Length(aPath) - Length(stem)));
         BREAK;
       end;
     end;
@@ -125,24 +127,71 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
-  class function Path.Branch(const aPath: String): String;
+  class function Path.Branch(const aPath: String;
+                             var   aParent: String): Boolean;
   {
-    Returns the path containing the specified path or an empty
-     string if the specified path has no identifiable branch.
+    Returns in aParent the path containing the specified path or an empty
+     string if the specified path has no parent.
 
     Examples:
 
         Branch( 'abc\def\ghi' )  ==> 'abc\def'
         Branch( 'abc' )          ==> ''
+        Branch( 'c:\windows' )   ==> 'c:\'
+        Branch( 'c:\windows\' )  ==> 'c:\'
+        Branch( 'c:\' )          ==> ''
+        Branch( '\\host\share' ) ==> '\\host'
+        Branch( '\\host' )       ==> ''
+        Branch( '\\host\' )      ==> ''
   }
+  var
+    i: Integer;
   begin
-    if Pos('\', aPath) <> 0 then
-    begin
-      result := ExtractFilePath(aPath);
-      SetLength(result, Length(result) - 1);
-    end
+    result  := FALSE;
+    aParent := Trim(aPath);
+
+    if Length(aParent) = 0 then
+      EXIT;
+
+    if aParent[Length(aParent)] = '\' then
+      SetLength(aParent, Length(aParent) - 1);
+
+    if (Length(aParent) >= 2) and (aParent[1] = '\') and (aParent[2] = '\') then
+      result := Pos('\', aParent, 3) > 0
     else
-      result := '';
+      result := Pos('\', aParent) > 0;
+
+    if NOT result then
+    begin
+      aParent := '';
+      EXIT;
+    end;
+
+    for i := Length(aParent) downto 1 do
+    begin
+      if aParent[i] = '\' then
+      begin
+        SetLength(aParent, i - 1);
+        BREAK;
+      end;
+    end;
+
+    case Length(aParent) of
+      1 : if aParent[1] = '\' then
+            aParent := '';
+
+      2 : if aParent[2] = ':' then
+            aParent := aParent + '\';
+    end;
+
+    result := Length(aParent) > 0;
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function Path.Branch(const aPath: String): String;
+  begin
+    Branch(aPath, result);
   end;
 
 
