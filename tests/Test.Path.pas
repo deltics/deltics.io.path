@@ -146,6 +146,27 @@ implementation
   end;
 
 
+  procedure PathTests.IsNavigation;
+  var
+    result: Boolean;
+  begin
+    result := Path.IsNavigation('.');
+    Test('IsNavigation(.)').Assert(result).IsTrue;
+
+    result := Path.IsNavigation('..');
+    Test('IsNavigation(..)').Assert(result).IsTrue;
+
+    result := Path.IsNavigation('');
+    Test('IsNavigation()').Assert(result).IsFalse;
+
+    result := Path.IsNavigation('.\relative');
+    Test('IsNavigation(.\relative)').Assert(result).IsFalse;
+
+    result := Path.IsNavigation('..\relative');
+    Test('IsNavigation(..\relative)').Assert(result).IsFalse;
+  end;
+
+
   procedure PathTests.IsRelative;
   var
     result: Boolean;

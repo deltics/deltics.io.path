@@ -176,6 +176,19 @@ implementation
 
 
   { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
+  class function Path.IsNavigation(const aPath: String): Boolean;
+  begin
+    case Length(aPath) of
+      1 : result := aPath[1] = '.';
+
+      2 : result := (aPath[1] = '.') and (aPath[2] = '.');
+    else
+      result := FALSE;
+    end;
+  end;
+
+
+  { - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - }
   class function Path.IsRelative(const aPath: String): Boolean;
   begin
     result := NOT IsAbsolute(aPath);
