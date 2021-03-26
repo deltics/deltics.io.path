@@ -157,7 +157,11 @@ implementation
       SetLength(aParent, Length(aParent) - 1);
 
     if (Length(aParent) >= 2) and (aParent[1] = '\') and (aParent[2] = '\') then
+    {$ifdef DELPHIXE3__}
       result := Pos('\', aParent, 3) > 0
+    {$else}
+      result := Pos('\', Copy(aParent, 3, Length(aParent) - 2)) > 0
+    {$endif}
     else
       result := Pos('\', aParent) > 0;
 
